@@ -18,39 +18,45 @@ The project currently compares two models:
 
 ---
 
-# Project Structure (edit as I create more files)
+## Project Structure 
+
+```
 iris_production_project/
 │
-├── api/ (FastAPI / inference)
+├── api/                         # FastAPI / inference service (future)
+│
 ├── data/
-│ ├── raw/ # Original dataset
-│ └── processed/ # Cleaned dataset
+│   ├── raw/                     # Original dataset
+│   └── processed/               # Cleaned dataset
 │
-├── model_artifacts/ # Saved trained models (offline)
-│ ├── logreg.joblib
-│ └── xgb.joblib
+├── model_artifacts/             # Saved trained models (offline)
+│   ├── logreg.joblib
+│   └── xgb.joblib
 │
-├── notebooks/ # Exploratory notebooks
-│ ├── iris_to_csv.ipynb
-│ ├── iris_training_logistic_regression.ipynb
-│ └── iris_training_XGBoost.ipynb
+├── notebooks/                   # Exploratory notebooks
+│   ├── iris_to_csv.ipynb
+│   ├── iris_training_logistic_regression.ipynb
+│   └── iris_training_XGBoost.ipynb
 │
-├── reports/ # Evaluation results (offline)
-│ ├── logreg/ # Logistic Regression 
-│ └── xgb/ # XG Boost
-|
+├── reports/                     # Evaluation results
+│   ├── logreg/                  # Logistic Regression CV metrics
+│   └── xgb/                     # XGBoost CV metrics
+│
 ├── src/
-│ ├── models/ # Model definitions
-│ | ├── logistic_regression_model/py/ # Logistic Regression 
-│ | └── xgboost_model.py/ # XG Boost
-│ ├── preprocess.py # Data loading + preprocessing
-│ ├── make_dataset.py # Dataset preparation script
-│ ├── train_evaluate.py # Model training + cross validation
-│ └── log_metrics.py # Metric logging utilities
+│   ├── models/                  # Model definitions
+│   │   ├── logistic_regression_model.py
+│   │   └── xgboost_model.py
+│   │
+│   ├── preprocess.py            # Data loading + preprocessing
+│   ├── make_dataset.py          # Dataset preparation script
+│   ├── train_evaluate.py        # Model training + cross validation
+│   └── log_metrics.py           # Metric logging utilities
 │
 ├── requirements.txt
 ├── Dockerfile
 └── README.md
+```
+
 
 ## Models
 
@@ -175,4 +181,5 @@ Possible next steps:
 ## Purpose
 
 This project demonstrates how to structure a **reproducible machine learning pipeline** suitable for production-style development.
+
 
