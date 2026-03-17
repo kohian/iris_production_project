@@ -1,4 +1,4 @@
-from src.preprocess import (
+from src.preprocess_funcs import (
     load_raw_data,
     clean_data,
     save_processed_data

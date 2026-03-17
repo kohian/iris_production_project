@@ -1,15 +1,20 @@
 import json
-from pathlib import Path
+import gcsfs
+# from pathlib import Path
+from src.config import REPORTS_DIR
 import pandas as pd
 import numpy as np
 
 def log_metrics(scores, model_name):
-    REPORTS_DIR = Path(f"reports/{model_name}") 
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    # REPORTS_DIR = Path(f"reports/{model_name}") 
+    # REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    report_path = f"{REPORTS_DIR}/{model_name}/cv_scores.csv"
+    summary_path = f"{REPORTS_DIR}/{model_name}/cv_summary.json"
+
 
     # scores is the dict from cross_validate(...)
     df_scores = pd.DataFrame(scores)                 # columns: fit_time, score_time, test_accuracy, ...
-    df_scores.to_csv(REPORTS_DIR / "cv_scores.csv", index=False)
+    df_scores.to_csv(report_path, index=False)
 
     summary = {}
     for col in df_scores.columns:
@@ -21,7 +26,11 @@ def log_metrics(scores, model_name):
                 "max": float(np.max(df_scores[col])),
             }
 
-    with open(REPORTS_DIR / "cv_summary.json", "w", encoding="utf-8") as f:
+    # with open(summary_path, "w", encoding="utf-8") as f:
+    #     json.dump(summary, f, indent=2)
+
+    fs = gcsfs.GCSFileSystem()
+    with fs.open(summary_path, "w") as f:
         json.dump(summary, f, indent=2)
 
-    print("Saved:", REPORTS_DIR / "cv_scores.csv", "and", REPORTS_DIR / "cv_summary.json")
+    print("Saved:", summary_path, "and", summary_path)
