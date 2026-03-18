@@ -17,4 +17,7 @@ RUN chown -R appuser:appuser /app
 
 USER appuser
 
-CMD ["python", "-m", "src.train_evaluate"]
+# CMD ["python", "-m", "src.train_evaluate"]
+
+ENTRYPOINT ["python", "-m"]
+CMD ["src.train_evaluate"]
