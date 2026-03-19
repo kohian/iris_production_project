@@ -6,6 +6,10 @@ on:
   #     - main
   workflow_dispatch:
 
+concurrency:
+  group: docker-build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docker_build_push:
     runs-on: ubuntu-latest
@@ -26,6 +30,8 @@ jobs:
 
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: iris-ml-production
 
       - name: Configure Docker
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
