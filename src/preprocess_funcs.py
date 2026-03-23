@@ -1,7 +1,8 @@
 # from pathlib import Path
-from src.config import RAW_PATH, PROCESSED_PATH
 # from src.config import RAW_PATH
 import pandas as pd
+
+from src.config import PROCESSED_PATH, RAW_PATH
 
 # # RAW_PATH = Path("data/raw/iris.csv")
 # PROCESSED_PATH = Path("data/processed/iris_processed.csv")

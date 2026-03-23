@@ -1,9 +1,12 @@
 import json
+
 import gcsfs
+import numpy as np
+import pandas as pd
+
 # from pathlib import Path
 from src.config import REPORTS_DIR
-import pandas as pd
-import numpy as np
+
 
 def log_metrics(scores, model_name):
     # REPORTS_DIR = Path(f"reports/{model_name}") 
@@ -13,7 +16,8 @@ def log_metrics(scores, model_name):
 
 
     # scores is the dict from cross_validate(...)
-    df_scores = pd.DataFrame(scores)                 # columns: fit_time, score_time, test_accuracy, ...
+    # columns: fit_time, score_time, test_accuracy, ...
+    df_scores = pd.DataFrame(scores)                 
     df_scores.to_csv(report_path, index=False)
 
     summary = {}

@@ -1,15 +1,14 @@
 # from pathlib import Path
-from src.config import MODEL_DIR
-import gcsfs
 import argparse
-import joblib
-# from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_validate, StratifiedKFold
-# from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, classification_report
 
-from src.preprocess_funcs import load_processed_data, split_features_target, get_named_target
-from src.models import logistic_regression_model, xgboost_model
+import gcsfs
+import joblib
+from sklearn.model_selection import StratifiedKFold, cross_validate
+
+from src.config import MODEL_DIR
 from src.log_metrics import log_metrics
+from src.models import logistic_regression_model, xgboost_model
+from src.preprocess_funcs import load_processed_data, split_features_target  #, get_named_target
 
 # MODEL_DIR = Path("model_artifacts")
 
@@ -48,7 +47,7 @@ def main():
     scores = cross_validate(model, X, y, cv=skf, scoring=metrics)
 
     log_metrics(scores,args.model)
-    print(f"Metrics logged to reports folder")
+    print("Metrics logged to reports folder")
 
 if __name__ == "__main__":
     main()

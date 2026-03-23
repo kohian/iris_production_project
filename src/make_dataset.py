@@ -1,8 +1,5 @@
-from src.preprocess_funcs import (
-    load_raw_data,
-    clean_data,
-    save_processed_data
-)
+from src.preprocess_funcs import clean_data, load_raw_data, save_processed_data
+
 
 def main():
     

@@ -8,6 +8,7 @@
 
 
 import gcsfs
+
 from src.config import RAW_PATH
 
 fs = gcsfs.GCSFileSystem()
