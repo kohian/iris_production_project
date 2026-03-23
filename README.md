@@ -1,15 +1,20 @@
-# Iris Production ML Pipeline
+# MLOps Pipeline Production Project
 
-A small end-to-end machine learning pipeline using the classic **Iris dataset**.  
-The goal of this project is to demonstrate a **clean ML engineering workflow** including:
+This project demonstrates a production-style MLOps pipeline built around the classic Iris classification problem.
 
-- dataset preparation
-- preprocessing
-- model training
-- cross-validation evaluation
-- experiment logging
-- model artifact storage
-- reproducible project structure
+The Iris dataset is intentionally used as a simple and well-understood task so that the focus remains on machine learning engineering and system design, rather than model complexity.
+As such, the pipeline is deliberately over-engineered to reflect real-world production practices.
+
+The goal is to showcase a complete, end-to-end workflow that emphasizes:
+
+structured data processing
+reproducible preprocessing
+model training and cross-validation
+experiment tracking and logging
+model artifact management
+clean, maintainable project structure
+
+This project is designed to mirror how machine learning systems are built, tested, and maintained in a production environment.
 
 The project currently compares two models:
 
