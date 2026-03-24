@@ -1,7 +1,7 @@
 import pandas as pd
 
-from src.models.logistic_regression_model import train as train_logreg
-from src.models.xgboost_model import train as train_xgb
+from iris_production_project.models.logistic_regression_model import train as train_logreg
+from iris_production_project.models.xgboost_model import train as train_xgb
 
 
 def make_small_dataset():

@@ -5,10 +5,10 @@ import gcsfs
 import joblib
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
-from src.config import MODEL_DIR
-from src.log_metrics import log_metrics
-from src.models import logistic_regression_model, xgboost_model
-from src.preprocess_funcs import load_processed_data, split_features_target  #, get_named_target
+from iris_production_project.config import MODEL_DIR
+from iris_production_project.log_metrics import log_metrics
+from iris_production_project.models import logistic_regression_model, xgboost_model
+from iris_production_project.preprocess_funcs import load_processed_data, split_features_target
 
 # MODEL_DIR = Path("model_artifacts")
 

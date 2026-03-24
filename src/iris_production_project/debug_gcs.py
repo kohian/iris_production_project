@@ -9,7 +9,7 @@
 
 import gcsfs
 
-from src.config import RAW_PATH
+from iris_production_project.config import RAW_PATH
 
 fs = gcsfs.GCSFileSystem()
 

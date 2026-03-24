@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # from pathlib import Path
-from src.config import REPORTS_DIR
+from iris_production_project.config import REPORTS_DIR
 
 
 def log_metrics(scores, model_name):

@@ -1,10 +1,10 @@
 import pandas as pd
 import pytest
 
-from src.preprocess_funcs import (
+from iris_production_project.preprocess_funcs import (
     clean_data,
-    split_features_target,
     get_named_target,
+    split_features_target,
 )
 
 

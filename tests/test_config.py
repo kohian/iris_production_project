@@ -1,4 +1,4 @@
-from src.config import BUCKET, RAW_PATH, PROCESSED_PATH, MODEL_DIR, REPORTS_DIR
+from iris_production_project.config import BUCKET, MODEL_DIR, PROCESSED_PATH, RAW_PATH, REPORTS_DIR
 
 
 def test_bucket_path_prefix():

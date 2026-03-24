@@ -11,14 +11,14 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# COPY . .
+COPY pyproject.toml .
 COPY src/ ./src/
+
+RUN pip install --no-cache-dir .
 
 RUN chown -R appuser:appuser /app
 
 USER appuser
 
-# CMD ["python", "-m", "src.train_evaluate"]
-
 ENTRYPOINT ["python", "-m"]
-CMD ["src.train_evaluate"]
+CMD ["iris_production_project.train_evaluate"]

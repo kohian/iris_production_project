@@ -1,4 +1,4 @@
-from src.preprocess_funcs import clean_data, load_raw_data, save_processed_data
+from iris_production_project.preprocess_funcs import clean_data, load_raw_data, save_processed_data
 
 
 def main():
