@@ -1,0 +1,24 @@
+FROM python:3.11-slim
+
+RUN useradd -m appuser
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+COPY requirements.txt .
+COPY requirements_dev.txt .
+RUN pip install --no-cache-dir -r requirements_dev.txt
+
+COPY pyproject.toml .
+COPY src/ ./src/
+COPY tests/ ./tests/
+
+RUN pip install --no-cache-dir -e .
+
+RUN chown -R appuser:appuser /app
+
+USER appuser
+
+CMD ["pytest"]
