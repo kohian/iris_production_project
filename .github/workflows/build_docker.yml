@@ -21,7 +21,10 @@ jobs:
       # - name: Build Docker dev image
       #   run: |
       #     docker build -f Dockerfile_dev -t iris-dev .
-          
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+              
       - name: Build Docker dev image
         uses: docker/build-push-action@v7
         with:
