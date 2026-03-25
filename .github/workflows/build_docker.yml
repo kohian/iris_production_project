@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Test and Ruff then Push Docker Image
 
 on: 
   # push:
@@ -11,7 +11,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  docker_lint_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build Docker dev image
+        run: |
+          docker build -f Dockerfile_dev -t iris-dev .
+    
+      - name: Run lint in docker container
+        run: |
+          docker run --rm iris-dev ruff check src tests
+
+      - name: Run pytest on docker container
+        run: |
+          docker run --rm iris-dev
+
+
   docker_build_push:
+    needs: docker_lint_test
     runs-on: ubuntu-latest
 
     permissions:
