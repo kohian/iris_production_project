@@ -18,10 +18,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # - name: Build Docker dev image
+      #   run: |
+      #     docker build -f Dockerfile_dev -t iris-dev .
+          
       - name: Build Docker dev image
-        run: |
-          docker build -f Dockerfile_dev -t iris-dev .
-    
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile_dev
+          tags: iris-dev:latest
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Run lint in docker container
         run: |
           docker run --rm iris-dev ruff check src tests
