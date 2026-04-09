@@ -29,7 +29,8 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: ./Dockerfile_dev
+          file: ./Dockerfile
+          target: dev
           tags: iris-dev:latest
           load: true
           cache-from: type=gha
@@ -85,6 +86,8 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          file: ./Dockerfile
+          target: prod
           push: true
           tags: |
             us-central1-docker.pkg.dev/iris-ml-production/ian-docker-artifacts/iris-ml:${{ github.sha }}
