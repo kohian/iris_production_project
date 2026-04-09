@@ -1,107 +1,138 @@
-# MLOps Pipeline Production Project
+# MLOps Production Pipeline
 
-This project demonstrates a **production-style machine learning pipeline**, deliberately built around the simple Iris dataset.
+This project demonstrates a production-style machine learning pipeline, deliberately built around the simple Iris dataset.
 
-> ⚠️ **Note:** This project is intentionally **over-engineered** for a basic dataset.
-> The goal is not model complexity, but to showcase **real-world MLOps practices**, including pipeline design, reproducibility, testing, and deployment readiness.
+Note: This project is intentionally over-engineered for a basic dataset.
+The aim is not to showcase model complexity, but to demonstrate real-world MLOps and ML engineering practices such as modular pipeline design, packaging, testing, containerization, CI/CD, and cloud-based training workflows.
 
-The Iris dataset is used purely as a controlled environment to focus on **machine learning engineering and system design**, rather than experimentation.
+The Iris dataset is used as a controlled example so that the focus stays on engineering, reproducibility, and deployment-oriented design rather than on solving a difficult ML problem.
 
 ---
 
-##  Objectives
+## Objectives
 
 This project showcases an end-to-end ML pipeline with emphasis on:
 
 * Structured and reproducible data processing
 * Modular pipeline design
+* Python package-based project organization
 * Cross-validation based evaluation
-* Experiment logging and reporting
-* Testable and maintainable codebase
-* Containerized execution (Docker)
-* Production-oriented project structure
+* Metrics logging and report generation
+* Containerized execution with multi-stage Docker builds
+* Automated linting and testing in CI
+* Cloud container registry integration
+* Cloud training workflow using Vertex AI
 
 ---
-##  Project Structure
 
-```
+## Project Structure
+
+```text
 .
+├── .github/
+│   └── workflows/
+│       └── build_docker.yml
+│
 ├── data/
-│   ├── raw/                      # Original dataset
+│   ├── raw/
 │   │   └── iris.csv
-│   └── processed/                # Processed dataset
+│   └── processed/
 │       └── iris_processed.csv
 │
-├── model_artifacts/              # (Not tracked in Git) saved models
-├── reports/                      # (Not tracked in Git) evaluation outputs
-│
-├── notebooks/                    # Exploratory analysis
+├── model_artifacts/              # Not tracked in Git
+├── notebooks/
+├── reports/                      # Not tracked in Git
 │
 ├── src/
-│   └── iris_production_project/
-│       ├── config.py
-│       ├── make_dataset.py       # Data preparation
-│       ├── preprocess_funcs.py   # Preprocessing logic
-│       ├── train_evaluate.py     # Training + evaluation pipeline
-│       ├── log_metrics.py        # Metrics logging
-│       └── models/
-│           ├── logistic_regression_model.py
-│           └── xgboost_model.py
+│   ├── iris_production_project/
+│   │   ├── config.py
+│   │   ├── log_metrics.py
+│   │   ├── make_dataset.py
+│   │   ├── preprocess_funcs.py
+│   │   ├── train_evaluate.py
+│   │   └── models/
+│   │       ├── logistic_regression_model.py
+│   │       └── xgboost_model.py
+│   └── iris_production_project.egg-info/
 │
-├── tests/                        # Unit tests
+├── tests/
 │   ├── test_config.py
 │   ├── test_log_metrics.py
 │   ├── test_models.py
 │   ├── test_preprocess_funcs.py
 │   └── test_train_evaluate.py
 │
-├── Dockerfile                    # Single container for pipeline execution
-├── pyproject.toml                # Packaging + tooling config
+├── .dockerignore
+├── .gitattributes
+├── .gitignore
+├── Dockerfile
+├── pip_freeze_dump.txt
+├── pyproject.toml
+├── README.md
 ├── requirements.txt
-├── requirements_dev.txt
-└── README.md
+└── requirements_dev.txt
 ```
 
-##  Models
+---
+
+## Models
 
 The project currently implements and compares:
 
-### Logistic Regression
+Logistic Regression
 
 * Scikit-learn implementation
 * Serves as a baseline model
 
-### XGBoost
+XGBoost
 
 * Gradient boosting decision trees
-* Strong performance for tabular data
+* Strong performance for tabular classification problems
 
 ---
 
-##  Evaluation
+## Evaluation
 
-Models are evaluated using **Stratified K-Fold Cross Validation**.
+Models are evaluated using Stratified K-Fold Cross Validation.
 
-Metrics tracked:
+Metrics tracked include:
 
 * Accuracy
 * Precision (macro)
 * Recall (macro)
-* F1 Score (macro)
+* F1 score (macro)
 
-Evaluation results are exported as structured reports (not committed to Git).
+Evaluation results are exported as structured reports, while trained models are saved as artifacts outside version control.
 
 ---
 
-##  Setup (Local)
+## Python Packaging
 
-Create virtual environment:
+The project is structured as an installable Python package using `pyproject.toml`.
+
+This allows the pipeline to be executed as:
+
+```bash
+python -m iris_production_project.train_evaluate
+```
+
+Inside the Docker image, the package is installed using:
+
+```bash
+pip install --no-cache-dir --no-deps .
+```
+
+---
+
+## Local Setup
+
+Create a virtual environment:
 
 ```bash
 python -m venv .venv
 ```
 
-Activate (Windows):
+Activate on Windows:
 
 ```bash
 .venv\Scripts\activate
@@ -113,44 +144,84 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
+Install the project package:
+
+```bash
+pip install --no-deps .
+```
+
+Install development dependencies:
+
+```bash
+pip install -r requirements_dev.txt
+```
+
 ---
 
-##  Running the Pipeline
+## Running the Pipeline Locally
 
-### 1. Prepare Dataset
+Prepare dataset:
 
 ```bash
 python -m iris_production_project.make_dataset
 ```
 
-* Loads raw data
-* Applies preprocessing
-* Saves processed dataset
-
----
-
-### 2. Train & Evaluate
+Train and evaluate:
 
 ```bash
 python -m iris_production_project.train_evaluate
 ```
 
-This step:
-
-* Loads processed data
-* Trains models
-* Performs cross-validation
-* Logs evaluation metrics
-* Saves model artifacts (locally, not in repo)
+This performs data loading, preprocessing, model training, cross-validation, metric logging, and artifact generation.
 
 ---
 
-##  Docker Usage
+## Docker Design
 
-Build image:
+This project uses a single multi-stage Dockerfile.
+
+Stages:
+
+Base stage
+
+* Installs runtime dependencies
+* Copies source code
+* Installs the project as a package
+
+Prod stage
+
+* Runs the training pipeline
+* Entry point:
+  `python -m iris_production_project.train_evaluate`
+
+Dev stage
+
+* Installs development dependencies
+* Includes test suite
+* Default command runs `pytest`
+
+Build development image:
 
 ```bash
-docker build -t iris-ml-pipeline .
+docker build --target dev -t iris-dev .
+```
+
+Run tests:
+
+```bash
+docker run --rm iris-dev
+```
+
+Run lint:
+
+```bash
+docker run --rm iris-dev ruff check src tests
+```
+
+Build production image:
+
+```bash
+docker build --target prod -t iris-ml-pipeline .
 ```
 
 Run pipeline:
@@ -159,80 +230,119 @@ Run pipeline:
 docker run --rm iris-ml-pipeline
 ```
 
-The container executes:
+---
 
-```bash
-python -m iris_production_project.train_evaluate
-```
+## Testing and Linting
+
+Tools used:
+
+* pytest
+* ruff
+
+Test coverage includes:
+
+* configuration
+* preprocessing
+* model definitions
+* training pipeline
+* metrics logging
+
+Testing and linting are executed both locally and within Docker, and are enforced in CI.
 
 ---
 
-##  Testing & Code Quality
+## CI/CD with GitHub Actions
 
-Development dependencies include:
+The workflow consists of two jobs.
 
-* `pytest` for testing
-* `ruff` for linting
+First job (lint and test):
 
-Run tests:
+* Builds the dev Docker image
+* Runs ruff against src and tests
+* Runs pytest inside the container
 
-```bash
-pytest
-```
+Second job (build and push):
 
-Run linting:
+* Authenticates to Google Cloud via Workload Identity Federation
+* Builds the production Docker image
+* Pushes the image to Google Artifact Registry
 
-```bash
-ruff check src tests
-```
-
----
-
-##  Artifacts & Reports
-
-The following are intentionally **excluded from version control**:
-
-* `model_artifacts/` → trained models
-* `reports/` → evaluation outputs
-
-This mirrors production practice where:
-
-* artifacts are stored in object storage (e.g., GCS, S3)
-* reports are logged to tracking systems or dashboards
+Images are tagged using both commit SHA and latest.
 
 ---
 
-##  Design Philosophy
+## Google Cloud Integration
 
-This project is not about achieving the best model performance.
+The production container is pushed to Google Artifact Registry and used for Vertex AI custom training.
 
-Instead, it focuses on:
+Workflow:
 
-> “How would this look if it had to run in production?”
-
-Key principles:
-
-* Separation of concerns (data, models, pipeline)
-* Reproducibility
-* Testability
-* Clear structure and extensibility
-* Container-first execution
+1. GitHub Actions builds and pushes the container
+2. Vertex AI pulls the container image
+3. Training runs using the packaged module entry point
 
 ---
 
-##  Tech Stack
+## GitHub Actions Authentication and Permissions
+
+Authentication is implemented using Workload Identity Federation.
+
+Required permissions include:
+
+* Artifact Registry Writer (to push images)
+* Workload Identity User (to allow GitHub to impersonate the service account)
+
+Additional IAM bindings are required to connect the GitHub identity provider to the service account.
+
+---
+
+## Artifacts and Reports
+
+The following are excluded from version control:
+
+* model_artifacts/
+* reports/
+
+These outputs are typically stored in external systems in production environments.
+
+---
+
+## Design Philosophy
+
+This project focuses on engineering practices rather than model performance.
+
+Core principles:
+
+* separation of concerns
+* reproducibility
+* testability
+* modular design
+* container-first workflow
+* package-based execution
+* cloud compatibility
+
+---
+
+## Tech Stack
 
 * Python
 * scikit-learn
 * XGBoost
-* pandas / numpy
+* pandas
+* numpy
+* pytest
+* ruff
 * Docker
-* pytest / ruff
+* GitHub Actions
+* Google Artifact Registry
+* Vertex AI
 
 ---
 
-##  Summary
+## Summary
 
-This project demonstrates how to structure a **production-ready machine learning pipeline**, even for a simple dataset.
+Although this project uses the Iris dataset, it is designed to reflect how machine learning systems are built in production.
 
-It is designed as a **portfolio project for MLOps / Machine Learning Engineering roles**, emphasizing system design and engineering practices over model complexity.
+It demonstrates a complete workflow including packaging, testing, containerization, CI/CD, and cloud-based training.
+
+This is best understood as a deliberately over-engineered MLOps project focused on machine learning engineering practices rather than model complexity.
