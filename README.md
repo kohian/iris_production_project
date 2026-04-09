@@ -1,94 +1,101 @@
 # MLOps Pipeline Production Project
 
-This project demonstrates a production-style MLOps pipeline built around the classic Iris classification problem.
+This project demonstrates a **production-style machine learning pipeline**, deliberately built around the simple Iris dataset.
 
-The Iris dataset is intentionally used as a simple and well-understood task so that the focus remains on machine learning engineering and system design, rather than model complexity.
-As such, the pipeline is deliberately over-engineered to reflect real-world production practices.
+> ⚠️ **Note:** This project is intentionally **over-engineered** for a basic dataset.
+> The goal is not model complexity, but to showcase **real-world MLOps practices**, including pipeline design, reproducibility, testing, and deployment readiness.
 
-The goal is to showcase a complete, end-to-end workflow that emphasizes:
-
-structured data processing
-reproducible preprocessing
-model training and cross-validation
-experiment tracking and logging
-model artifact management
-clean, maintainable project structure
-
-This project is designed to mirror how machine learning systems are built, tested, and maintained in a production environment.
-
-The project currently compares two models:
-
-- Logistic Regression
-- XGBoost
+The Iris dataset is used purely as a controlled environment to focus on **machine learning engineering and system design**, rather than experimentation.
 
 ---
 
-## Project Structure 
+##  Objectives
+
+This project showcases an end-to-end ML pipeline with emphasis on:
+
+* Structured and reproducible data processing
+* Modular pipeline design
+* Cross-validation based evaluation
+* Experiment logging and reporting
+* Testable and maintainable codebase
+* Containerized execution (Docker)
+* Production-oriented project structure
+
+---
+##  Project Structure
 
 ```
-iris_production_project/
-│
-├── api/                         # FastAPI / inference service (future)
-│
+.
 ├── data/
-│   ├── raw/                     # Original dataset
-│   └── processed/               # Cleaned dataset
+│   ├── raw/                      # Original dataset
+│   │   └── iris.csv
+│   └── processed/                # Processed dataset
+│       └── iris_processed.csv
 │
-├── model_artifacts/             # Saved trained models (offline)
-│   ├── logreg.joblib
-│   └── xgb.joblib
+├── model_artifacts/              # (Not tracked in Git) saved models
+├── reports/                      # (Not tracked in Git) evaluation outputs
 │
-├── notebooks/                   # Exploratory notebooks
-│   ├── iris_to_csv.ipynb
-│   ├── iris_training_logistic_regression.ipynb
-│   └── iris_training_XGBoost.ipynb
-│
-├── reports/                     # Evaluation results
-│   ├── logreg/                  # Logistic Regression CV metrics
-│   └── xgb/                     # XGBoost CV metrics
+├── notebooks/                    # Exploratory analysis
 │
 ├── src/
-│   ├── models/                  # Model definitions
-│   │   ├── logistic_regression_model.py
-│   │   └── xgboost_model.py
-│   │
-│   ├── preprocess.py            # Data loading + preprocessing
-│   ├── make_dataset.py          # Dataset preparation script
-│   ├── train_evaluate.py        # Model training + cross validation
-│   └── log_metrics.py           # Metric logging utilities
+│   └── iris_production_project/
+│       ├── config.py
+│       ├── make_dataset.py       # Data preparation
+│       ├── preprocess_funcs.py   # Preprocessing logic
+│       ├── train_evaluate.py     # Training + evaluation pipeline
+│       ├── log_metrics.py        # Metrics logging
+│       └── models/
+│           ├── logistic_regression_model.py
+│           └── xgboost_model.py
 │
+├── tests/                        # Unit tests
+│   ├── test_config.py
+│   ├── test_log_metrics.py
+│   ├── test_models.py
+│   ├── test_preprocess_funcs.py
+│   └── test_train_evaluate.py
+│
+├── Dockerfile                    # Single container for pipeline execution
+├── pyproject.toml                # Packaging + tooling config
 ├── requirements.txt
-├── Dockerfile
+├── requirements_dev.txt
 └── README.md
 ```
 
+##  Models
 
-## Models
-
-Currently implemented:
+The project currently implements and compares:
 
 ### Logistic Regression
 
-* sklearn implementation
-* baseline model
+* Scikit-learn implementation
+* Serves as a baseline model
 
 ### XGBoost
 
-* gradient boosting decision trees
-* often strong for tabular data
+* Gradient boosting decision trees
+* Strong performance for tabular data
 
-Models are evaluated using **Stratified K-Fold cross validation** with the following metrics:
+---
+
+##  Evaluation
+
+Models are evaluated using **Stratified K-Fold Cross Validation**.
+
+Metrics tracked:
 
 * Accuracy
 * Precision (macro)
 * Recall (macro)
-* F1 score (macro)
+* F1 Score (macro)
+
+Evaluation results are exported as structured reports (not committed to Git).
 
 ---
 
-## Setup
+##  Setup (Local)
 
-Create a virtual environment:
+Create virtual environment:
 
 ```bash
 python -m venv .venv
@@ -108,83 +115,124 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Pipeline
+##  Running the Pipeline
 
-### 1️⃣ Prepare the dataset
-
-```bash
-python -m src.make_dataset
-```
-
-This will create the processed dataset.
-
----
-
-### 2️⃣ Train and evaluate models
+### 1. Prepare Dataset
 
 ```bash
-python -m src.train_evaluate
+python -m iris_production_project.make_dataset
 ```
 
-This script:
-
-* loads processed data
-* saves trained models
-* runs cross validation
-* logs metrics
+* Loads raw data
+* Applies preprocessing
+* Saves processed dataset
 
 ---
 
-## Example Outputs
+### 2. Train & Evaluate
 
-Models are saved to:
-
-```
-model_artifacts/
+```bash
+python -m iris_production_project.train_evaluate
 ```
 
-Evaluation reports are saved to:
+This step:
 
-```
-reports/model_name
-```
-
-## Notebooks
-
-The `notebooks` folder contains exploratory work:
-
-* dataset preparation
-* model experimentation
-* baseline evaluation
+* Loads processed data
+* Trains models
+* Performs cross-validation
+* Logs evaluation metrics
+* Saves model artifacts (locally, not in repo)
 
 ---
 
-## Future Improvements
+##  Docker Usage
 
-Possible next steps:
+Build image:
 
-* Add PyTorch neural network model
-* Hyperparameter search
-* Model comparison dashboard
-* FastAPI inference service
-* Dockerized deployment
-* experiment tracking (MLflow / Weights & Biases)
+```bash
+docker build -t iris-ml-pipeline .
+```
+
+Run pipeline:
+
+```bash
+docker run --rm iris-ml-pipeline
+```
+
+The container executes:
+
+```bash
+python -m iris_production_project.train_evaluate
+```
 
 ---
 
-## Technologies Used
+##  Testing & Code Quality
+
+Development dependencies include:
+
+* `pytest` for testing
+* `ruff` for linting
+
+Run tests:
+
+```bash
+pytest
+```
+
+Run linting:
+
+```bash
+ruff check src tests
+```
+
+---
+
+##  Artifacts & Reports
+
+The following are intentionally **excluded from version control**:
+
+* `model_artifacts/` → trained models
+* `reports/` → evaluation outputs
+
+This mirrors production practice where:
+
+* artifacts are stored in object storage (e.g., GCS, S3)
+* reports are logged to tracking systems or dashboards
+
+---
+
+##  Design Philosophy
+
+This project is not about achieving the best model performance.
+
+Instead, it focuses on:
+
+> “How would this look if it had to run in production?”
+
+Key principles:
+
+* Separation of concerns (data, models, pipeline)
+* Reproducibility
+* Testability
+* Clear structure and extensibility
+* Container-first execution
+
+---
+
+##  Tech Stack
 
 * Python
 * scikit-learn
 * XGBoost
-* pandas
-* numpy
-* joblib
+* pandas / numpy
+* Docker
+* pytest / ruff
 
 ---
 
-## Purpose
+##  Summary
 
-This project demonstrates how to structure a **reproducible machine learning pipeline** suitable for production-style development.
+This project demonstrates how to structure a **production-ready machine learning pipeline**, even for a simple dataset.
 
-
+It is designed as a **portfolio project for MLOps / Machine Learning Engineering roles**, emphasizing system design and engineering practices over model complexity.
