@@ -4,7 +4,6 @@ import json
 import gcsfs
 from google.cloud import aiplatform
 
-
 PROJECT = "iris-ml-production"
 REGION = "us-central1"
 
