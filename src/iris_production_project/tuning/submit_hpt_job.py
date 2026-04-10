@@ -137,4 +137,4 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
-# example: python submit_hpt_job.py --model xgb --max-trials 4 --parallel-trials 2    
+# example: python -m iris_production_project.tuning.submit_hpt_job --model xgb --max-trials 4 --parallel-trials 2
