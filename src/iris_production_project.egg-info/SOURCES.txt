@@ -14,6 +14,11 @@ src/iris_production_project.egg-info/requires.txt
 src/iris_production_project.egg-info/top_level.txt
 src/iris_production_project/models/logistic_regression_model.py
 src/iris_production_project/models/xgboost_model.py
+src/iris_production_project/tuning/build_model.py
+src/iris_production_project/tuning/extract_best_params.py
+src/iris_production_project/tuning/parse_args.py
+src/iris_production_project/tuning/submit_hpt_job.py
+src/iris_production_project/tuning/train_tune.py
 tests/test_config.py
 tests/test_log_metrics.py
 tests/test_models.py

@@ -17,6 +17,7 @@ dependencies = [
     "pandas",
     "scikit-learn",
     "xgboost",
+    "cloudml-hypertune",
 ]
 
 # tells setuptools your package code lives under src/
