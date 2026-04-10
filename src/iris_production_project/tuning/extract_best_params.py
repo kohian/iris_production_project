@@ -71,6 +71,4 @@ if __name__ == "__main__":
     main()
 
 # example usage
-# python extract_best_params.py \
-#   --job-id 1234567890123456789 \
-#   --filename xgb/2026-04-10/best_params.json
+# python -m iris_production_project.tuning.extract_best_params --job-id 7333581324193628160 --filename xgb/20260410-151741.json

@@ -26,6 +26,15 @@ FROM base AS prod
 # RUN chown -R appuser:appuser /app
 # USER appuser
 
+# ensure directory exists
+RUN mkdir -p /var/hypertune
+
+# give ALL users write access (safe in container context)
+RUN chmod -R 777 /var/hypertune
+
+RUN chown -R appuser:appuser /app
+USER appuser
+
 ENTRYPOINT ["python", "-m"]
 CMD ["iris_production_project.train_evaluate"]
 
