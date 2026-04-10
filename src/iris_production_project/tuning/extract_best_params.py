@@ -55,3 +55,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# example usage
+#     python extract_best_params.py \
+#   --job-name "projects/iris-ml-production/locations/us-central1/hyperparameterTuningJobs/1234567890123456789" \
+#   --output-path "gs://my-bucket/best_params/xgb/2026-04-10/best_params.json"
