@@ -3,7 +3,6 @@ from datetime import datetime
 
 from google.cloud import aiplatform
 
-
 PROJECT_ID = "iris-ml-production"
 LOCATION = "us-central1"
 API_ENDPOINT = f"{LOCATION}-aiplatform.googleapis.com"

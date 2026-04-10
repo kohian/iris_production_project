@@ -1,8 +1,8 @@
 from sklearn.model_selection import StratifiedKFold, cross_validate
 
 from iris_production_project.preprocess_funcs import load_processed_data, split_features_target
-from iris_production_project.tuning.parse_args import parse_args
 from iris_production_project.tuning.build_model import build_model
+from iris_production_project.tuning.parse_args import parse_args
 
 try:
     from hypertune import HyperTune
