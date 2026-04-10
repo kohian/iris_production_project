@@ -22,9 +22,9 @@ RUN pip install --no-cache-dir --no-deps .
 # -------------------------
 FROM base AS prod
 # allow hypertune to write metrics
-RUN mkdir -p /var/hypertune && chown -R appuser:appuser /var/hypertune
-RUN chown -R appuser:appuser /app
-USER appuser
+# RUN mkdir -p /var/hypertune && chown -R appuser:appuser /var/hypertune
+# RUN chown -R appuser:appuser /app
+# USER appuser
 
 ENTRYPOINT ["python", "-m"]
 CMD ["iris_production_project.train_evaluate"]
