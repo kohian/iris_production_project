@@ -31,3 +31,21 @@ def test_xgboost_train_returns_fitted_model():
     assert hasattr(model, "predict")
     assert hasattr(model, "classes_")
     assert len(model.classes_) == 3
+
+def test_xgboost_train_accepts_params():
+    X, y = make_small_dataset()
+    model = train_xgb(
+        X,
+        y,
+        params={
+            "learning_rate": 0.05,
+            "max_depth": 4,
+            "n_estimators": 50,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+        },
+    )
+
+    assert hasattr(model, "predict")
+    assert model.max_depth == 4
+    assert model.n_estimators == 50

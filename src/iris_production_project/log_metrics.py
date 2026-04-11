@@ -8,11 +8,12 @@ import pandas as pd
 from iris_production_project.config import REPORTS_DIR
 
 
-def log_metrics(scores, model_name):
+def log_metrics(scores, model_name, run_name):
+
     # REPORTS_DIR = Path(f"reports/{model_name}") 
     # REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    report_path = f"{REPORTS_DIR}/{model_name}/cv_scores.csv"
-    summary_path = f"{REPORTS_DIR}/{model_name}/cv_summary.json"
+    report_path = f"{REPORTS_DIR}/{model_name}/{run_name}_cv_scores.csv"
+    summary_path = f"{REPORTS_DIR}/{model_name}/{run_name}_cv_summary.json"
 
 
     # scores is the dict from cross_validate(...)
@@ -33,8 +34,17 @@ def log_metrics(scores, model_name):
     # with open(summary_path, "w", encoding="utf-8") as f:
     #     json.dump(summary, f, indent=2)
 
+    summary_output = {
+        "model": model_name,
+        "run_name": run_name,
+        "metrics": summary,
+    }
+
     fs = gcsfs.GCSFileSystem()
     with fs.open(summary_path, "w") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(summary_output, f, indent=2)
 
-    print("Saved:", summary_path, "and", summary_path)
+    # with fs.open(summary_path, "w") as f:
+    #     json.dump(summary, f, indent=2)
+
+    print("Saved:", report_path, "and", summary_path)

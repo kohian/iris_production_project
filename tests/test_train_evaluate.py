@@ -42,6 +42,7 @@ def test_main_runs_training_and_logging_for_logreg(monkeypatch):
     logged = {}
 
     monkeypatch.setattr(te, "load_processed_data", lambda: df)
+    monkeypatch.setattr(te, "load_best_params", lambda model, params_file: {})
 
     monkeypatch.setattr(
         te,
@@ -57,8 +58,12 @@ def test_main_runs_training_and_logging_for_logreg(monkeypatch):
     monkeypatch.setattr(
         te,
         "log_metrics",
-        lambda scores, model_name: logged.update(
-            {"scores": scores, "model_name": model_name}
+        lambda scores, model_name, run_name: logged.update(
+            {
+                "scores": scores,
+                "model_name": model_name,
+                "run_name": run_name,
+            }
         ),
     )
 
@@ -70,12 +75,16 @@ def test_main_runs_training_and_logging_for_logreg(monkeypatch):
     )
 
     original_registry = te.MODEL_REGISTRY.copy()
-    te.MODEL_REGISTRY["logreg"] = lambda X, y: DummyModel()
+    te.MODEL_REGISTRY["logreg"] = lambda X, y, params=None: DummyModel()
 
     monkeypatch.setattr(
         te.argparse.ArgumentParser,
         "parse_args",
-        lambda self: type("Args", (), {"model": "logreg"})(),
+        lambda self: type(
+            "Args",
+            (),
+            {"model": "logreg", "params_file": None},
+        )(),
     )
 
     try:
@@ -86,4 +95,5 @@ def test_main_runs_training_and_logging_for_logreg(monkeypatch):
 
     assert "model" in saved
     assert logged["model_name"] == "logreg"
+    assert logged["run_name"] == "baseline"
     assert "test_accuracy" in logged["scores"]
