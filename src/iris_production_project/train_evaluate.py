@@ -1,5 +1,6 @@
 import argparse
 import json
+from datetime import datetime
 
 import gcsfs
 import joblib
@@ -9,7 +10,6 @@ from iris_production_project.config import MODEL_DIR
 from iris_production_project.log_metrics import log_metrics
 from iris_production_project.models import logistic_regression_model, xgboost_model
 from iris_production_project.preprocess_funcs import load_processed_data, split_features_target
-from datetime import datetime
 
 MODEL_REGISTRY = {
     "logreg": logistic_regression_model.train,
