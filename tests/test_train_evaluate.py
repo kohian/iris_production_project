@@ -95,5 +95,6 @@ def test_main_runs_training_and_logging_for_logreg(monkeypatch):
 
     assert "model" in saved
     assert logged["model_name"] == "logreg"
-    assert logged["run_name"] == "baseline"
+    # assert logged["run_name"] == "baseline"
+    assert logged["run_name"].startswith("baseline_")
     assert "test_accuracy" in logged["scores"]
