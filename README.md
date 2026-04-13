@@ -17,6 +17,7 @@ This project showcases an end-to-end ML pipeline with emphasis on:
 * Modular pipeline design
 * Python package-based project organization
 * Cross-validation based evaluation
+* Hyperparameter tuning workflow (Vertex AI)
 * Metrics logging and report generation
 * Containerized execution with multi-stage Docker builds
 * Automated linting and testing in CI
@@ -40,8 +41,8 @@ This project showcases an end-to-end ML pipeline with emphasis on:
 │       └── iris_processed.csv
 │
 ├── model_artifacts/              # Not tracked in Git
-├── notebooks/
 ├── reports/                      # Not tracked in Git
+├── notebooks/
 │
 ├── src/
 │   ├── iris_production_project/
@@ -50,9 +51,18 @@ This project showcases an end-to-end ML pipeline with emphasis on:
 │   │   ├── make_dataset.py
 │   │   ├── preprocess_funcs.py
 │   │   ├── train_evaluate.py
-│   │   └── models/
-│   │       ├── logistic_regression_model.py
-│   │       └── xgboost_model.py
+│   │   │
+│   │   ├── models/
+│   │   │   ├── logistic_regression_model.py
+│   │   │   └── xgboost_model.py
+│   │   │
+│   │   ├── tuning/
+│   │   │   ├── build_model.py
+│   │   │   ├── extract_best_params.py
+│   │   │   ├── parse_args.py
+│   │   │   ├── submit_hpt_job.py
+│   │   │   └── train_tune.py
+│   │
 │   └── iris_production_project.egg-info/
 │
 ├── tests/
@@ -79,12 +89,12 @@ This project showcases an end-to-end ML pipeline with emphasis on:
 
 The project currently implements and compares:
 
-Logistic Regression
+### Logistic Regression
 
 * Scikit-learn implementation
 * Serves as a baseline model
 
-XGBoost
+### XGBoost
 
 * Gradient boosting decision trees
 * Strong performance for tabular classification problems
@@ -106,17 +116,138 @@ Evaluation results are exported as structured reports, while trained models are 
 
 ---
 
+## Hyperparameter Tuning (Vertex AI)
+
+This project includes a hyperparameter tuning workflow using Vertex AI Hyperparameter Tuning Jobs.
+
+### Tuning Components
+
+Located under:
+
+```
+src/iris_production_project/tuning/
+```
+
+* `submit_hpt_job.py`
+  Submits a Vertex AI Hyperparameter Tuning job
+
+* `train_tune.py`
+  Entry point executed by each Vertex AI trial
+
+* `parse_args.py`
+  Handles parameter parsing for tuning runs
+
+* `build_model.py`
+  Constructs model instances based on provided hyperparameters
+
+* `extract_best_params.py`
+  Extracts the best-performing parameters and stores them in GCS
+
+---
+
+### Tuning Workflow
+
+1. Submit HPT job:
+
+```bash
+python -m iris_production_project.tuning.submit_hpt_job
+```
+
+2. Vertex AI runs multiple trials:
+
+* Each trial uses a different hyperparameter configuration
+* Each trial performs cross-validation
+
+3. Best parameters are extracted and saved to GCS:
+
+```
+gs://iris-csv/tuning/xgb/<timestamp>.json
+```
+
+---
+
+## Final Model Training with Tuned Parameters
+
+The training pipeline has been extended to support retraining using optimal hyperparameters from tuning.
+
+### Command
+
+```bash
+python -m iris_production_project.train_evaluate \
+    --model=xgb \
+    --params-file=20260410-151741.json
+```
+
+### Behavior
+
+* If `--params-file` is provided:
+
+  * Loads hyperparameters from GCS
+  * Trains model on full dataset using tuned parameters
+
+* If not provided:
+
+  * Runs baseline training using default parameters
+
+---
+
+## Important Concept
+
+Hyperparameter tuning does **not** produce a final deployable model.
+
+* Each HPT trial performs cross-validation
+* Each trial produces multiple models
+* The output of HPT is **best parameters**, not a trained model
+
+Therefore:
+
+* A final training step is required using the best parameters on the full dataset
+
+---
+
+## Run Naming Strategy
+
+To ensure traceability:
+
+* Tuned runs:
+
+```
+<params_filename>
+```
+
+* Baseline runs:
+
+```
+baseline_<timestamp>
+```
+
+---
+
+## Updated Pipeline Flow
+
+```
+Hyperparameter Tuning (Vertex AI)
+        ↓
+Best Parameters (GCS JSON)
+        ↓
+Final Training (train_evaluate.py)
+        ↓
+Model Artifact + Metrics Logging
+```
+
+---
+
 ## Python Packaging
 
 The project is structured as an installable Python package using `pyproject.toml`.
 
-This allows the pipeline to be executed as:
+This allows execution via:
 
 ```bash
 python -m iris_production_project.train_evaluate
 ```
 
-Inside the Docker image, the package is installed using:
+Inside Docker:
 
 ```bash
 pip install --no-cache-dir --no-deps .
@@ -126,13 +257,13 @@ pip install --no-cache-dir --no-deps .
 
 ## Local Setup
 
-Create a virtual environment:
+Create virtual environment:
 
 ```bash
 python -m venv .venv
 ```
 
-Activate on Windows:
+Activate (Windows):
 
 ```bash
 .venv\Scripts\activate
@@ -144,13 +275,13 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Install the project package:
+Install package:
 
 ```bash
 pip install --no-deps .
 ```
 
-Install development dependencies:
+Install dev dependencies:
 
 ```bash
 pip install -r requirements_dev.txt
@@ -172,35 +303,27 @@ Train and evaluate:
 python -m iris_production_project.train_evaluate
 ```
 
-This performs data loading, preprocessing, model training, cross-validation, metric logging, and artifact generation.
-
 ---
 
 ## Docker Design
 
-This project uses a single multi-stage Dockerfile.
+Multi-stage Dockerfile:
 
-Stages:
+### Base Stage
 
-Base stage
-
-* Installs runtime dependencies
+* Installs dependencies
 * Copies source code
-* Installs the project as a package
+* Installs package
 
-Prod stage
+### Prod Stage
 
-* Runs the training pipeline
-* Entry point:
-  `python -m iris_production_project.train_evaluate`
+* Runs training pipeline
 
-Dev stage
+### Dev Stage
 
-* Installs development dependencies
-* Includes test suite
-* Default command runs `pytest`
+* Includes tests and linting
 
-Build development image:
+Build dev image:
 
 ```bash
 docker build --target dev -t iris-dev .
@@ -218,7 +341,7 @@ Run lint:
 docker run --rm iris-dev ruff check src tests
 ```
 
-Build production image:
+Build prod image:
 
 ```bash
 docker build --target prod -t iris-ml-pipeline .
@@ -247,63 +370,47 @@ Test coverage includes:
 * training pipeline
 * metrics logging
 
-Testing and linting are executed both locally and within Docker, and are enforced in CI.
-
 ---
 
 ## CI/CD with GitHub Actions
 
-The workflow consists of two jobs.
+Two-stage workflow:
 
-First job (lint and test):
+### 1. Lint and Test
 
-* Builds the dev Docker image
-* Runs ruff against src and tests
-* Runs pytest inside the container
+* Build dev Docker image
+* Run ruff
+* Run pytest
 
-Second job (build and push):
+### 2. Build and Push
 
-* Authenticates to Google Cloud via Workload Identity Federation
-* Builds the production Docker image
-* Pushes the image to Google Artifact Registry
+* Authenticate via Workload Identity Federation
+* Build Docker image
+* Push to Artifact Registry
 
-Images are tagged using both commit SHA and latest.
+Images are tagged using commit SHA and `latest`.
 
 ---
 
 ## Google Cloud Integration
 
-The production container is pushed to Google Artifact Registry and used for Vertex AI custom training.
-
 Workflow:
 
-1. GitHub Actions builds and pushes the container
-2. Vertex AI pulls the container image
-3. Training runs using the packaged module entry point
-
----
-
-## GitHub Actions Authentication and Permissions
-
-Authentication is implemented using Workload Identity Federation.
-
-Required permissions include:
-
-* Artifact Registry Writer (to push images)
-* Workload Identity User (to allow GitHub to impersonate the service account)
-
-Additional IAM bindings are required to connect the GitHub identity provider to the service account.
+1. GitHub Actions builds container
+2. Push to Artifact Registry
+3. Vertex AI pulls container
+4. Training runs using custom container
 
 ---
 
 ## Artifacts and Reports
 
-The following are excluded from version control:
+Excluded from version control:
 
 * model_artifacts/
 * reports/
 
-These outputs are typically stored in external systems in production environments.
+These are typically stored externally in production systems.
 
 ---
 
@@ -341,8 +448,14 @@ Core principles:
 
 ## Summary
 
-Although this project uses the Iris dataset, it is designed to reflect how machine learning systems are built in production.
+Although this project uses the Iris dataset, it reflects how machine learning systems are built in production.
 
-It demonstrates a complete workflow including packaging, testing, containerization, CI/CD, and cloud-based training.
+It demonstrates:
 
-This is best understood as a deliberately over-engineered MLOps project focused on machine learning engineering practices rather than model complexity.
+* cross-validation based evaluation
+* hyperparameter tuning workflows
+* retraining using optimal parameters
+* containerization and CI/CD
+* cloud-based training pipelines
+
+This is a production-oriented MLOps project focused on system design rather than model complexity.
