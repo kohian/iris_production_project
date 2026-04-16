@@ -7,6 +7,7 @@ The aim is not to showcase model complexity, but to demonstrate real-world MLOps
 
 The Iris dataset is used as a controlled example so that the focus stays on engineering, reproducibility, and deployment-oriented design rather than on solving a difficult ML problem.
 
+The API can be found here: https://github.com/kohian/iris_inference_api
 ---
 
 ## Objectives
